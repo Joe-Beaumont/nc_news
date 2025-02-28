@@ -1,3 +1,10 @@
 # NC News Seeding
 
-- Instructions for this sprint can be found at https://l2c.northcoders.com/courses/be/seeding-nc-news
+Create environment variable
+In the northcoders-news-BE directory, create two .env files:
+.env.development
+.env.test
+
+In each of these files write the following statement respectively:
+PGDATABASE=nc_news
+PGDATABASE=nc_news_test
