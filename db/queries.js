@@ -17,7 +17,7 @@ function queryUsers(){
 function codingArticles(){ 
     return db.query(`
         SELECT * FROM articles
-        WHERE topic IS 'coding';`)
+        WHERE topic = coding;`)
     .then((result) => {
         console.log(result.rows)
     })

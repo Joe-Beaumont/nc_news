@@ -1,5 +1,4 @@
 const db = require("../connection")
-const data = require("../data/test-data/index")
 const format = require ("pg-format");
 const utils = require("./utils")
 
@@ -28,7 +27,7 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
   })
   // Insert Topics Data
   .then(()=> {
-    const mappedTopics = data.topicData.map((topic) => {
+    const mappedTopics = topicData.map((topic) => {
       return [topic.slug, topic.description, topic.img_url]
     })
     const insertTopics = format(
@@ -39,16 +38,11 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
       RETURNING *;`,
       mappedTopics
     );
-    return insertTopics;
-  })
-  .then((insertTopics) => {
-    return db.query(insertTopics).then((topicsResponse) => {
-      return topicsResponse
-    })
+    return db.query(insertTopics)
   })
   // Insert Users Data
   .then(()=> {
-    const mappedUsers = data.userData.map((user) => {
+    const mappedUsers = userData.map((user) => {
       return [user.username, user.name, user.avatar_url]
     })
     const insertUsers = format(
@@ -59,47 +53,25 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
       RETURNING *;`,
       mappedUsers
     );
-    return insertUsers;
-  })
-  .then((insertUsers) => {
-    return db.query(insertUsers).then((usersResponse) => {
-      return usersResponse
-    })
+    return db.query(insertUsers)
   })
   // Insert articles data
   .then((usersResponse)=> {
     // Access to topics and users
-    const mappedTopics = data.topicData.map((topic) => {
-      return [topic.slug, topic.description, topic.img_url]
-    })
-    const users = usersResponse.rows;
-
-    //Reference objects
-    const username = utils.createRefObject(
-      users,
-      "author",
-      "username"
-    );
-
-    const topic = utils.createRefObject(
-      mappedTopics,
-      "topic",
-      "slug"
-    );
-
     //Mapping articles (including changing timestamp)
-    const mappedArticles = data.articleData.map((article) => {
+    const mappedArticles = articleData.map((article) => {
         const updatedArticle = utils.convertTimestampToDate(article);
       return [
         updatedArticle.title,
-        topic[updatedArticle.topic],
-        username[updatedArticle.author],
+        updatedArticle.topic,
+        updatedArticle.author,
         updatedArticle.body,
         updatedArticle.created_at,
         updatedArticle.votes,
         updatedArticle.article_img_url
       ]
     })
+    console.log(mappedArticles)
     // Inserting into table
     const insertArticles = format(
       `INSERT INTO articles
@@ -109,43 +81,33 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
       RETURNING *;`,
       mappedArticles
     );
-    return insertArticles;
-  })
-  .then((insertArticles) => {
-    return db.query(insertArticles).then((articlesResponse) => {
-      return articlesResponse
-    })
+    return db.query(insertArticles)
   })
     // Insert comments data
   .then((articlesResponse) => {
     //Access to articles and users
     const articles = articlesResponse.rows
-    const mappedUsers = data.userData.map((user) => {
-      return [user.username, user.name, user.avatar_url]
-    })
     // Creating ref objects
     const article_id = utils.createRefObject(
       articles,
-      "article_title",
+      "title",
       "article_id"
     );
-    const username = utils.createRefObject(
-      mappedUsers,
-      "author",
-      "username"
-    );
+    // console.log(article_id)
     // mapping comments (including converting timestamp)
-    const mappedComments = data.commentData.map((comment) => {
+    const mappedComments = commentData.map((comment) => {
       const updatedComment = utils.convertTimestampToDate(comment);
       return [
         // updatedComment.comment_id,
-        article_id[updatedComment.article_id],
+        article_id[updatedComment.article_title],
         updatedComment.body,
         updatedComment.votes,
-        username[updatedComment.author],
+        updatedComment.author,
         updatedComment.created_at
       ]
     })
+
+    // console.log(mappedComments)
     // Inserting into table
     const insertComments = format(
       `INSERT INTO comments
@@ -155,12 +117,7 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
       RETURNING *;`,
       mappedComments
     );
-    return insertComments;
-  })
-  .then((insertComments) => {
-    return db.query(insertComments).then((commentsResponse) => {
-      return commentsResponse
-    })
+    return db.query(insertComments)
   })
 };
 
