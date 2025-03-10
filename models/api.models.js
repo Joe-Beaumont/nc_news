@@ -8,11 +8,4 @@ const modGetAPI = () => {
     })
 }
 
-const modGetTopics = () => {
-    return db.query(`SELECT * FROM topics`)
-    .then(({rows}) => {
-        console.log(rows, "<< rows model")
-        return rows
-    })
-}
-module.exports = { modGetAPI, modGetTopics }
+module.exports = { modGetAPI }
