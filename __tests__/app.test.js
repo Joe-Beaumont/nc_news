@@ -19,8 +19,22 @@ describe("GET /api", () => {
       .get("/api")
       .expect(200)
       .then(({ body: { endpoints } }) => {
-        console.log(endpoints, "<< endpoints in test")
         expect(endpoints).toEqual(endpointsJson);
       });
+  });
+});
+
+describe.only("GET /api/topics", () => {
+  test("200: Repsonds with a list of all topics", () => {
+    return request(app)
+    .get('/api/topics')
+    .expect(200)
+    .then(({ body }) => {
+      const { topics } = body
+      topics.forEach((element) => {
+        expect(typeof element.slug).toBe("string")
+        expect(typeof element.description).toBe("string")
+      })
+    })
   });
 });
