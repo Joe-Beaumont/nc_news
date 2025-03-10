@@ -25,99 +25,17 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
   .then(()=> {
     return createComments();
   })
-  // Insert Topics Data
   .then(()=> {
-    const mappedTopics = topicData.map((topic) => {
-      return [topic.slug, topic.description, topic.img_url]
-    })
-    const insertTopics = format(
-      `INSERT INTO topics
-      (slug, description, img_url)
-      VALUES
-      %L
-      RETURNING *;`,
-      mappedTopics
-    );
-    return db.query(insertTopics)
+    return populateTopics(topicData);
   })
-  // Insert Users Data
   .then(()=> {
-    const mappedUsers = userData.map((user) => {
-      return [user.username, user.name, user.avatar_url]
-    })
-    const insertUsers = format(
-      `INSERT INTO users
-      (username, name, avatar_url)
-      VALUES
-      %L
-      RETURNING *;`,
-      mappedUsers
-    );
-    return db.query(insertUsers)
+    return populateUsers(userData)
   })
-  // Insert articles data
-  .then((usersResponse)=> {
-    // Access to topics and users
-    //Mapping articles (including changing timestamp)
-    const mappedArticles = articleData.map((article) => {
-        const updatedArticle = utils.convertTimestampToDate(article);
-      return [
-        updatedArticle.title,
-        updatedArticle.topic,
-        updatedArticle.author,
-        updatedArticle.body,
-        updatedArticle.created_at,
-        updatedArticle.votes,
-        updatedArticle.article_img_url
-      ]
-    })
-    console.log(mappedArticles)
-    // Inserting into table
-    const insertArticles = format(
-      `INSERT INTO articles
-      (title, topic, author, body, created_at, votes, article_img_url)
-      VALUES
-      %L
-      RETURNING *;`,
-      mappedArticles
-    );
-    return db.query(insertArticles)
+  .then(()=> {
+    return populateArticles(articleData)
   })
-    // Insert comments data
   .then((articlesResponse) => {
-    //Access to articles and users
-    const articles = articlesResponse.rows
-    // Creating ref objects
-    const article_id = utils.createRefObject(
-      articles,
-      "title",
-      "article_id"
-    );
-    // console.log(article_id)
-    // mapping comments (including converting timestamp)
-    const mappedComments = commentData.map((comment) => {
-      const updatedComment = utils.convertTimestampToDate(comment);
-      return [
-        // updatedComment.comment_id,
-        article_id[updatedComment.article_title],
-        updatedComment.body,
-        updatedComment.votes,
-        updatedComment.author,
-        updatedComment.created_at
-      ]
-    })
-
-    // console.log(mappedComments)
-    // Inserting into table
-    const insertComments = format(
-      `INSERT INTO comments
-      (article_id, body, votes, author, created_at)
-      VALUES
-      %L
-      RETURNING *;`,
-      mappedComments
-    );
-    return db.query(insertComments)
+    return populateComments(commentData, articlesResponse)
   })
 };
 
@@ -161,5 +79,88 @@ return db.query(`CREATE TABLE comments (
   );`)
 }
 
+function populateTopics(topicData){
+  const mappedTopics = topicData.map((topic) => {
+    return [topic.slug, topic.description, topic.img_url]
+  })
+  const insertTopics = format(
+    `INSERT INTO topics
+    (slug, description, img_url)
+    VALUES
+    %L
+    RETURNING *;`,
+    mappedTopics
+  );
+  return db.query(insertTopics)
+}
+
+function populateUsers(userData){
+  const mappedUsers = userData.map((user) => {
+    return [user.username, user.name, user.avatar_url]
+  })
+  const insertUsers = format(
+    `INSERT INTO users
+    (username, name, avatar_url)
+    VALUES
+    %L
+    RETURNING *;`,
+    mappedUsers
+  );
+  return db.query(insertUsers)
+}
+
+function populateArticles(articleData){
+  const mappedArticles = articleData.map((article) => {
+    const updatedArticle = utils.convertTimestampToDate(article);
+  return [
+    updatedArticle.title,
+    updatedArticle.topic,
+    updatedArticle.author,
+    updatedArticle.body,
+    updatedArticle.created_at,
+    updatedArticle.votes,
+    updatedArticle.article_img_url
+  ]
+})
+const insertArticles = format(
+  `INSERT INTO articles
+  (title, topic, author, body, created_at, votes, article_img_url)
+  VALUES
+  %L
+  RETURNING *;`,
+  mappedArticles
+);
+return db.query(insertArticles)
+}
+
+function populateComments(commentData, articlesResponse){
+      const articles = articlesResponse.rows
+      const article_id = utils.createRefObject(
+        articles,
+        "title",
+        "article_id"
+      );
+
+      const mappedComments = commentData.map((comment) => {
+        const updatedComment = utils.convertTimestampToDate(comment);
+        return [
+          article_id[updatedComment.article_title],
+          updatedComment.body,
+          updatedComment.votes,
+          updatedComment.author,
+          updatedComment.created_at
+        ]
+      })
+
+      const insertComments = format(
+        `INSERT INTO comments
+        (article_id, body, votes, author, created_at)
+        VALUES
+        %L
+        RETURNING *;`,
+        mappedComments
+      );
+      return db.query(insertComments)
+}
 
 module.exports = seed;
