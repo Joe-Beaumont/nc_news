@@ -1,4 +1,4 @@
-const { modGetAPI } = require("../models/getModels");
+const { modGetAPI, modGetTopics } = require("../models/getModels");
 
 const conGetAPI = (request, response) => {
     modGetAPI().then((endpoints) => {
@@ -6,5 +6,13 @@ const conGetAPI = (request, response) => {
         response.status(200).send({endpoints: endpoints})
     })
 };
+const conGetTopics = (request, response) => {
+    modGetTopics().then((topics)=> {
+        console.log(topics, "<< topics in controller")
+        response.status(200).send({topics: topics})
+    })
+}
 
-module.exports = { conGetAPI }
+
+
+module.exports = { conGetAPI, conGetTopics }
