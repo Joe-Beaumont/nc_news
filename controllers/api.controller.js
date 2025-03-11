@@ -1,8 +1,7 @@
-const { modGetAPI } = require("../models/api.models")
+const { modGetAPI } = require("../models/api.model")
 
 const conGetAPI = (request, response) => {
     modGetAPI().then((endpoints) => {
-        console.log(endpoints, "<< endpoints in controller")
         response.status(200).send({endpoints: endpoints})
     })
 };
