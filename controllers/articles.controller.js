@@ -1,14 +1,20 @@
-const { modGetArticleByID } = require("../models/articles.model")
+const { modGetArticleByID, modGetArticles } = require("../models/articles.model")
 
 const conGetArticleByID = (request, response, next) => {
     const {article_id} = request.params
     modGetArticleByID(article_id).then((article) => {
-        console.log(article)
         response.status(200).send({article: article})
     }).catch((err) => {
-        // console.log(err)
         next(err);
     })
 }
 
-module.exports = { conGetArticleByID }
+const conGetArticles = (request, response, next) => {
+    modGetArticles().then((articles) => {
+        response.status(200).send({articles: articles})
+    }).catch((err) =>{
+        next(err);
+    })
+}
+
+module.exports = { conGetArticleByID, conGetArticles }

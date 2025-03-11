@@ -4,6 +4,7 @@ const request = require("supertest");
 const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const app = require("../app");
+require("jest-sorted")
 
 
 beforeEach(() => {
@@ -67,6 +68,29 @@ describe("GET /api/articles/:article_id", () => {
     })
   })
 });
+
+describe("GET /api/articles", () => {
+  test.only("responds with all articles sorted by created_at in descending order", () => {
+    return request(app)
+    .get("/api/articles")
+    .expect(200)
+    .then(({body}) => {
+      const { articles } = body
+      expect(articles.length).toBe(13)
+      expect(articles).toBeSortedBy("created_at", {descending: true})
+      articles.forEach((article) => {
+        expect(typeof article.article_id).toEqual("number");
+        expect(typeof article.title).toEqual("string");
+        expect(typeof article.topic).toEqual("string");
+        expect(typeof article.author).toEqual("string");
+        expect(typeof article.created_at).toEqual("string");
+        expect(typeof article.votes).toEqual("number");
+        expect(typeof article.article_img_url).toEqual("string");
+        expect(typeof article.comment_count).toEqual("number")
+      })
+    })
+  })
+})
 
 describe("Errors", () => {
   test("404: Repsonds with a 404 when presented a non-existant endpoint", () => {
