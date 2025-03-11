@@ -53,6 +53,7 @@ describe("GET /api/articles/:article_id", () => {
       expect(article[0].author).toEqual("icellusedkars");
       expect(article[0].body).toEqual("Call me Mitchell. Some years ago..");
       expect(article[0].votes).toEqual(0);
+      expect(article[0].created_at).toEqual("2020-10-16T05:03:00.000Z")
       expect(article[0].article_img_url).toEqual("https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700");
     })
   })
