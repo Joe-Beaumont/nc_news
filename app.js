@@ -4,7 +4,7 @@ const { conGetTopics } = require("./controllers/topics.controller")
 const { conGetArticleByID, conGetArticles, conPatchArticles } = require('./controllers/articles.controller')
 const app = express();
 const { handle404, handlePostgresErrors, handleCustomErrors, handleServerErrors } = require("./controllers/error.controller");
-const { conPostComment, conGetComments } = require("./controllers/comments.controller");
+const { conPostComment, conGetComments, conDeleteComments } = require("./controllers/comments.controller");
 
 app.use(express.json());
 
@@ -21,6 +21,8 @@ app.get("/api/articles/:article_id/comments", conGetComments)
 app.patch("/api/articles/:article_id", conPatchArticles)
 
 app.post("/api/articles/:article_id/comments", conPostComment)
+
+app.delete("/api/comments/:comment_id", conDeleteComments)
 
 
 // Middleware
