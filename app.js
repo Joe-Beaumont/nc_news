@@ -3,7 +3,8 @@ const { conGetAPI } = require("./controllers/api.controller")
 const { conGetTopics } = require("./controllers/topics.controller")
 const { conGetArticleByID, conGetArticles } = require('./controllers/articles.controller')
 const app = express();
-const { handle404, handlePostgresErrors, handleCustomErrors, handleServerErrors } = require("./controllers/error.controller")
+const { handle404, handlePostgresErrors, handleCustomErrors, handleServerErrors } = require("./controllers/error.controller");
+const { conPostComment } = require("./controllers/comments.controller");
 
 
 app.get("/api", conGetAPI);
@@ -15,7 +16,15 @@ app.get("/api/articles/:article_id", conGetArticleByID);
 app.get("/api/articles", conGetArticles)
 
 
-app.all('/*', handle404)
+app.use(express.json());
+
+app.post("/api/articles/:article_id/comments", conPostComment)
+
+
+// Middleware
+
+
+app.all('/*', handle404);
 
 app.use(handlePostgresErrors);
 

@@ -43,5 +43,14 @@
         }
       ]
     }
-  }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "Add a comment to a specified article",
+    "queries": [],
+    "exampleResponse": {
+      "comment" : "test-body"
+    }
+  } 
+
+
 }
