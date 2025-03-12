@@ -10,7 +10,6 @@ const conPostComment = (request, response, next) => {
             return Promise.reject({ status: 404, msg: "Not a valid id" })
         } else {
         const { title } = article[0];
-        console.log(title)
 
         return modPostComment(article_id, body, username)
             .then((comment) => {

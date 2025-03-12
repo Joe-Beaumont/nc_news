@@ -11,7 +11,6 @@ function handlePostgresErrors(err, req, res, next){
 };
 
 function handleCustomErrors(err, req, res, next){
-    console.log(err)
     if(err){
     console.log(err);
     res.status(err.status).send({msg: err.msg});

@@ -5,7 +5,7 @@ const modGetArticleByID = (article_id) => {
         .query(`SELECT * FROM articles WHERE article_id = $1`, [article_id])
         .then(({ rows }) => {
             if (rows.length === 0) {
-                return Promise.reject({ status: 404, msg: "Not a valid id" });
+                return Promise.reject({ status: 404, msg: "No articles with that id" });
             } else {
                 return rows;
             }
@@ -23,7 +23,7 @@ const modGetArticles = () => {
          ORDER BY a.created_at desc`)
         .then(({ rows }) => {
             if (rows.length === 0) {
-                return promises.reject({ status: 404, msg: "No articles found" })
+                return Promise.reject({ status: 404, msg: "No articles found" })
             } else {
                 rows.forEach((article) => {
                     article.comment_count = Number(article.comment_count)
@@ -33,4 +33,20 @@ const modGetArticles = () => {
         })
 }
 
-module.exports = { modGetArticleByID, modGetArticles }
+const modPatchArticles = (votes, article_id) => {
+    if (typeof votes === "number") {
+        return db
+            .query(`UPDATE articles a SET votes = votes + $1 WHERE a.article_id = $2 RETURNING *`, [votes, article_id])
+            .then(({ rows }) => {
+                if (rows.length === 0) {
+                    return Promise.reject({ status: 404, msg: "No articles with that id" });
+                } else {
+                    return rows;
+                }
+            })
+    } else {
+        return Promise.reject({ status: 400, msg: "Votes provided not a number" })
+    }
+}
+
+module.exports = { modGetArticleByID, modGetArticles, modPatchArticles }
