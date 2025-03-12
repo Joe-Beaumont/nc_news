@@ -1,7 +1,7 @@
 const db = require("../db/connection")
 // const format = require("pg-format");
 
-const modPostComment = (article_id, body) => {
+const modPostComment = (article_id, body, username) => {
     if (body) {
         // const insertComment = format(
         //     `INSERT INTO comments
@@ -14,7 +14,7 @@ const modPostComment = (article_id, body) => {
         // // console.log(insertComment, "INSERT")
         return db.query(`INSERT INTO comments (article_id, body) VALUES ($1, $2) RETURNING *`, [article_id, body])
             .then(({ rows }) => {
-                return rows;
+                return rows[0];
             })
     } else {
         return Promise.reject({ status: 400, body: "Incorrect user or empty body" })

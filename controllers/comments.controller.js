@@ -12,9 +12,10 @@ const conPostComment = (request, response, next) => {
         const { title } = article[0];
         console.log(title)
 
-        return modPostComment(article_id, body)
+        return modPostComment(article_id, body, username)
             .then((comment) => {
-                return response.status(201).send({ comment: "test-body" })
+                const { body } = comment
+                return response.status(201).send({ comment: body })
             }).catch((err) => {
                 next(err);
             })
