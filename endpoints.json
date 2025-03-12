@@ -50,7 +50,20 @@
     "exampleResponse": {
       "comment" : "test-body"
     }
+  },
+  "PATCH /api/articles/:article_id": {
+    "description": "Add a specified number of votes to a specified article",
+    "queries": [],
+    "exampleResponse":
+    {
+        "title": "Seafood substitutions are increasing",
+        "topic": "cooking",
+        "author": "weegembump",
+        "body": "Text from the article..",
+        "created_at": "2018-05-30T15:59:13.341Z",
+        "votes": 3,
+        "comment_count": 6
+    }
   } 
-
 
 }
