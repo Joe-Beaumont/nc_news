@@ -1,4 +1,4 @@
-const { modPostComment } = require("../models/comments.model")
+const { modPostComment, modGetComments } = require("../models/comments.model")
 const { modGetArticleByID } = require("../models/articles.model")
 
 const conPostComment = (request, response, next) => {
@@ -22,7 +22,15 @@ const conPostComment = (request, response, next) => {
     })
 }
 
+const conGetComments = (request, response, next) => {
+    const { article_id } = request.params
+    modGetComments(article_id)
+    .then((comments) => {
+        response.status(200).send({comments: comments})
+    }).catch((err) => {
+        next(err)
+    })
+}
 
 
-
-module.exports = { conPostComment }
+module.exports = { conPostComment, conGetComments }

@@ -1,6 +1,18 @@
 const db = require("../db/connection")
 // const format = require("pg-format");
 
+const modGetComments = (article_id) => {
+    return db
+        .query(`SELECT * FROM comments c WHERE c.article_id = $1 ORDER BY c.created_at ASC`, [article_id])
+        .then(({ rows }) => {
+            if (rows.length === 0) {
+                return Promise.reject({ status: 404, msg: "No comments found" });
+            } else {
+                return rows;
+            }
+        })
+}
+
 const modPostComment = (article_id, body, username) => {
     if (body) {
         // const insertComment = format(
@@ -21,4 +33,4 @@ const modPostComment = (article_id, body, username) => {
     }
 }
 
-module.exports = { modPostComment }
+module.exports = { modPostComment, modGetComments }
