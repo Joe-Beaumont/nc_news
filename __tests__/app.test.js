@@ -64,7 +64,7 @@ describe("GET /api/articles/:article_id", () => {
     .expect(404)
     .then(({ body }) => {
       const { msg } = body
-      expect(msg).toEqual("Not a valid id")
+      expect(msg).toEqual("No articles with that id")
     })
   })
 });
@@ -88,6 +88,39 @@ describe("GET /api/articles", () => {
         expect(typeof article.article_img_url).toEqual("string");
         expect(typeof article.comment_count).toEqual("number")
       })
+    })
+  })
+})
+
+describe("PATCH /api/articles/:article_id", () => {
+  test("Updates votes on article by amount provided in object", () => {
+    return request(app)
+    .patch("/api/articles/3")
+    .send({inc_votes: 3})
+    .expect(201)
+    .then(({ body }) => {
+      const { votes } = body.updatedArticle
+      expect(votes).toBe(3)
+    })
+  })
+  test("responds with 400 if votes is not a number", () => {
+    return request(app)
+    .patch("/api/articles/3")
+    .send({inc_votes: "3"})
+    .expect(400)
+    .then(({ body }) => {
+      const { msg } = body
+      expect(msg).toEqual("Votes provided not a number")
+    })
+  })
+  test("responds with 404 if id provided is valid but doesn't exist", () => {
+    return request(app)
+    .patch("/api/articles/999")
+    .send({inc_votes: 3})
+    .expect(404)
+    .then(({ body }) => {
+      const { msg } = body
+      expect(msg).toBe("No articles with that id")
     })
   })
 })

@@ -1,4 +1,4 @@
-const { modGetArticleByID, modGetArticles } = require("../models/articles.model")
+const { modGetArticleByID, modGetArticles, modPatchArticles } = require("../models/articles.model")
 
 const conGetArticleByID = (request, response, next) => {
     const {article_id} = request.params
@@ -17,4 +17,17 @@ const conGetArticles = (request, response, next) => {
     })
 }
 
-module.exports = { conGetArticleByID, conGetArticles }
+const conPatchArticles = (request, response, next) => {
+    const { article_id } = request.params
+    const { inc_votes } = request.body
+        modPatchArticles(inc_votes, article_id).then((article) => {
+            const updatedArticle = article[0]
+            response.status(201).send({updatedArticle: updatedArticle})
+        })
+        .catch((err) =>{
+            next(err);
+        })
+}
+
+
+module.exports = { conGetArticleByID, conGetArticles, conPatchArticles }
