@@ -70,7 +70,7 @@ describe("GET /api/articles/:article_id", () => {
 });
 
 describe("GET /api/articles", () => {
-  test.only("responds with all articles sorted by created_at in descending order", () => {
+  test("responds with all articles sorted by created_at in descending order", () => {
     return request(app)
     .get("/api/articles")
     .expect(200)
@@ -92,8 +92,24 @@ describe("GET /api/articles", () => {
   })
 })
 
+describe("POST /api/articles/:article_id/comments", () => {
+  test("adds comment to specified article", () => {
+    return request(app)
+    .post("/api/articles/3/comments")
+    .send({
+      username: 'test-user',
+      body: 'test-body'
+    })
+    .expect(201)
+    .then(({body}) => {
+      const { comment } = body
+      expect(comment).toBe('test-body')
+    })
+  })
+})
+
 describe("Errors", () => {
-  test("404: Repsonds with a 404 when presented a non-existant endpoint", () => {
+  test("404: Responds with a 404 when presented a non-existant endpoint", () => {
     return request(app)
     .get('/api/nonexistant')
     .expect(404)
