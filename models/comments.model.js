@@ -6,7 +6,7 @@ const modGetComments = (article_id) => {
         .query(`SELECT * FROM comments c WHERE c.article_id = $1 ORDER BY c.created_at ASC`, [article_id])
         .then(({ rows }) => {
             if (rows.length === 0) {
-                return Promise.reject({ status: 404, msg: "No comments found" });
+                return Promise.reject({ status: 404, msg: "No comments found" })
             } else {
                 return rows;
             }
@@ -33,4 +33,20 @@ const modPostComment = (article_id, body, username) => {
     }
 }
 
-module.exports = { modPostComment, modGetComments }
+const modDeleteComments = (comment_id) => {
+    return db.query(`SELECT * FROM comments c WHERE c.comment_id = $1`, [comment_id])
+    .then(({ rows }) => {
+        console.log(rows)
+        if(rows.length === 0) {
+            return Promise.reject({ status: 404, msg: "No comment found" })
+        } else {
+            return db.query(`DELETE FROM comments c WHERE c.comment_id = $1`, [comment_id])
+            .then(( { rows }) => {
+                console.log(rows)
+                return rows;
+            })
+        }
+    })
+}
+
+module.exports = { modPostComment, modGetComments, modDeleteComments }

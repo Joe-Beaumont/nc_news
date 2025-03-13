@@ -116,6 +116,15 @@ describe("GET /api/articles/:article_id/comments", () => {
       expect(msg).toBe("No comments found")
     })
   })
+  test("returns 400 if article_id is not valid", () => {
+    return request(app)
+    .get("/api/articles/notAnID/comments")
+    .expect(400)
+    .then(({ body }) => {
+      const { msg } = body
+      expect(msg).toBe("Invalid id")
+    })
+  })
 })
 
 describe("PATCH /api/articles/:article_id", () => {
@@ -164,6 +173,58 @@ describe("POST /api/articles/:article_id/comments", () => {
         const { comment } = body
         expect(comment).toBe('test-body')
       })
+  })
+  // test("Responds with a 404 if the article doesn't exist", () =>{
+  //   return request(app)
+  //   .post("/api/articles/999/comments")
+  //   .send({
+  //     username: 'test-user',
+  //     body: 'test-body'
+  //   })
+  //   .expect(404)
+  //   .then(({ body }) => {
+  //     const { msg } = body
+  //     expect(msg).toBe('No article found')
+  //   })
+  // })
+  test("returns 400 if article_id is not valid", () => {
+    return request(app)
+    .post("/api/articles/NotAnID/comments")
+    .send({
+      username: 'test-user',
+      body: 'test-body'
+    })
+    .expect(400)
+    .then(({ body }) => {
+      const { msg } = body
+      expect(msg).toBe('Invalid id')
+    })
+  })
+})
+
+describe("DELETE /api/comments/:comment_id", () => {
+  test("deletes given comment by comment_id", () => {
+    return request(app)
+    .delete("/api/comments/3")
+    .expect(204)
+  })
+  test("returns 404 if comment_id valid but doesn't exist", () => {
+    return request(app)
+    .delete("/api/comments/999")
+    .expect(404)
+    .then(({ body }) => {
+      const { msg } = body
+      expect(msg).toBe("No comment found")
+    })
+  })
+  test("returns 400 if comment_id not valid", () => {
+    return request(app)
+    .delete("/api/comments/notAnID")
+    .expect(400)
+    .then(({ body }) => {
+      const { msg } = body
+      expect(msg).toBe("Invalid id")
+    })
   })
 })
 

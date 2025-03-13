@@ -12,7 +12,7 @@ function handlePostgresErrors(err, req, res, next){
 
 function handleCustomErrors(err, req, res, next){
     if(err){
-    console.log(err);
+    // console.log(err);
     res.status(err.status).send({msg: err.msg});
     }
     else {
@@ -21,7 +21,7 @@ function handleCustomErrors(err, req, res, next){
 };
 
 function handleServerErrors(err, req, res, next){
-    console.log(err);
+    // console.log(err);
     res.send({msg: "Internal server error"});
 };
 
