@@ -66,7 +66,7 @@ describe("GET /api/articles/:article_id", () => {
 });
 
 describe("GET /api/articles", () => {
-  test("responds with all articles sorted by created_at in descending order", () => {
+  test("responds with all articles sorted by created_at in descending order as default", () => {
     return request(app)
       .get("/api/articles")
       .expect(200)
@@ -86,196 +86,216 @@ describe("GET /api/articles", () => {
         })
       })
   })
-})
-
-describe("GET /api/articles/:article_id/comments", () => {
-  test("Responds with all comments under the given article", () => {
+  test("Responds with all articles, sorted by given column name and in asc or desc as requested", () => {
     return request(app)
-      .get("/api/articles/3/comments")
+      .get("/api/articles?votes=ASC")
       .expect(200)
       .then(({ body }) => {
-        const { comments } = body
-        expect(comments.length).toBe(2)
-        expect(comments).toBeSortedBy("created_at", { descending: false })
-        comments.forEach((comment) => {
-          expect(typeof comment.comment_id).toBe("number")
-          expect(typeof comment.body).toBe("string"),
-            expect(typeof comment.votes).toBe("number"),
-            expect(typeof comment.author).toBe("string"),
-            expect(typeof comment.created_at).toBe("string"),
-            expect(comment.article_id).toBe(3)
+        const { articles } = body
+        expect(articles.length).toBe(13)
+        expect(articles).toBeSortedBy("votes", { descending: false })
+        articles.forEach((article) => {
+          expect(typeof article.article_id).toEqual("number");
+          expect(typeof article.title).toEqual("string");
+          expect(typeof article.topic).toEqual("string");
+          expect(typeof article.author).toEqual("string");
+          expect(typeof article.created_at).toEqual("string");
+          expect(typeof article.votes).toEqual("number");
+          expect(typeof article.article_img_url).toEqual("string");
+          expect(typeof article.comment_count).toEqual("number")
         })
       })
   })
-  test("Responds with a 404 if either the article doesn't exist or there are no comments associated", () =>{
-    return request(app)
-    .get("/api/articles/999/comments")
-    .expect(404)
-    .then(({ body }) => {
-      const { msg } = body
-      expect(msg).toBe("No comments found")
-    })
-  })
-  test("returns 400 if article_id is not valid", () => {
-    return request(app)
-    .get("/api/articles/notAnID/comments")
-    .expect(400)
-    .then(({ body }) => {
-      const { msg } = body
-      expect(msg).toBe("Invalid id")
-    })
-  })
 })
 
-describe("PATCH /api/articles/:article_id", () => {
-  test("Updates votes on article by amount provided in object", () => {
-    return request(app)
-      .patch("/api/articles/3")
-      .send({ inc_votes: 3 })
-      .expect(201)
-      .then(({ body }) => {
-        const { votes } = body.updatedArticle
-        expect(votes).toBe(3)
-      })
-  })
-  test("responds with 400 if votes is not a number", () => {
-    return request(app)
-      .patch("/api/articles/3")
-      .send({ inc_votes: "3" })
-      .expect(400)
-      .then(({ body }) => {
-        const { msg } = body
-        expect(msg).toEqual("Votes provided not a number")
-      })
-  })
-  test("responds with 404 if id provided is valid but doesn't exist", () => {
-    return request(app)
-      .patch("/api/articles/999")
-      .send({ inc_votes: 3 })
-      .expect(404)
-      .then(({ body }) => {
-        const { msg } = body
-        expect(msg).toBe("No articles with that id")
-      })
-  })
-})
-
-describe("POST /api/articles/:article_id/comments", () => {
-  test("adds comment to specified article", () => {
-    return request(app)
-      .post("/api/articles/3/comments")
-      .send({
-        username: 'butter_bridge',
-        body: 'test-body'
-      })
-      .expect(201)
-      .then(({ body }) => {
-        const { comment } = body
-        expect(comment).toBe('test-body')
-      })
-  })
-  test("Responds with a 400 if the user doesn't exist", () => {
-    return request(app)
-      .post("/api/articles/3/comments")
-      .send({
-        username: 'fake-user',
-        body: 'test-body'
-      })
-      .expect(400)
-      .then(({ body }) => {
-        console.log(body)
-        const { msg } = body
-        expect(msg).toBe('Incorrect user')
-      })
-  })
-  test("Responds with a 404 if the article doesn't exist", () =>{
-    return request(app)
-    .post("/api/articles/999/comments")
-    .send({
-      username: 'butter_bridge',
-      body: 'test-body'
-    })
-    .expect(404)
-    .then(({ body }) => {
-      const { msg } = body
-      expect(msg).toBe('No articles with that id')
-    })
-  })
-  test("returns 400 if article_id is not valid", () => {
-    return request(app)
-    .post("/api/articles/NotAnID/comments")
-    .send({
-      username: 'butter_bridge',
-      body: 'test-body'
-    })
-    .expect(400)
-    .then(({ body }) => {
-      const { msg } = body
-      expect(msg).toBe('Invalid id')
-    })
-  })
-})
-
-describe("DELETE /api/comments/:comment_id", () => {
-  test("deletes given comment by comment_id", () => {
-    return request(app)
-    .delete("/api/comments/3")
-    .expect(204)
-  })
-  test("returns 404 if comment_id valid but doesn't exist", () => {
-    return request(app)
-    .delete("/api/comments/999")
-    .expect(404)
-    .then(({ body }) => {
-      const { msg } = body
-      expect(msg).toBe("No comment found")
-    })
-  })
-  test("returns 400 if comment_id not valid", () => {
-    return request(app)
-    .delete("/api/comments/notAnID")
-    .expect(400)
-    .then(({ body }) => {
-      const { msg } = body
-      expect(msg).toBe("Invalid id")
-    })
-  })
-})
-
-describe("GET /api/users", () => {
-  test("Responds with all users", () => {
-    return request(app)
-      .get("/api/users")
-      .expect(200)
-      .then(({ body }) => {
-        const { users } = body
-        expect(users.length).toBe(4)
-        users.forEach((user) => {
-          expect(typeof user.username).toBe("string")
-          expect(typeof user.name).toBe("string"),
-            expect(typeof user.avatar_url).toBe("string")
+  describe("GET /api/articles/:article_id/comments", () => {
+    test("Responds with all comments under the given article", () => {
+      return request(app)
+        .get("/api/articles/3/comments")
+        .expect(200)
+        .then(({ body }) => {
+          const { comments } = body
+          expect(comments.length).toBe(2)
+          expect(comments).toBeSortedBy("created_at", { descending: false })
+          comments.forEach((comment) => {
+            expect(typeof comment.comment_id).toBe("number")
+            expect(typeof comment.body).toBe("string"),
+              expect(typeof comment.votes).toBe("number"),
+              expect(typeof comment.author).toBe("string"),
+              expect(typeof comment.created_at).toBe("string"),
+              expect(comment.article_id).toBe(3)
+          })
         })
-      })
+    })
+    test("Responds with a 404 if either the article doesn't exist or there are no comments associated", () => {
+      return request(app)
+        .get("/api/articles/999/comments")
+        .expect(404)
+        .then(({ body }) => {
+          const { msg } = body
+          expect(msg).toBe("No comments found")
+        })
+    })
+    test("returns 400 if article_id is not valid", () => {
+      return request(app)
+        .get("/api/articles/notAnID/comments")
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body
+          expect(msg).toBe("Invalid id")
+        })
+    })
   })
-  test("Responds with 404 if no users found", () => {
-    return request(app)
-      .get("/api/notusers")
-      .expect(404)
-      .then(({ body }) => {
-        const { msg } = body
-        expect(msg).toBe("Page does not exist")
-      })
-  })
-})
 
-describe("General Errors", () => {
-  test("404: Responds with a 404 when presented a non-existant endpoint", () => {
-    return request(app)
-      .get('/api/nonexistant')
-      .expect(404)
-      .then(({ body }) => {
-        const { msg } = body
-        expect(msg).toBe("Page does not exist")
-      })
+  describe("PATCH /api/articles/:article_id", () => {
+    test("Updates votes on article by amount provided in object", () => {
+      return request(app)
+        .patch("/api/articles/3")
+        .send({ inc_votes: 3 })
+        .expect(201)
+        .then(({ body }) => {
+          const { votes } = body.updatedArticle
+          expect(votes).toBe(3)
+        })
+    })
+    test("responds with 400 if votes is not a number", () => {
+      return request(app)
+        .patch("/api/articles/3")
+        .send({ inc_votes: "3" })
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body
+          expect(msg).toEqual("Votes provided not a number")
+        })
+    })
+    test("responds with 404 if id provided is valid but doesn't exist", () => {
+      return request(app)
+        .patch("/api/articles/999")
+        .send({ inc_votes: 3 })
+        .expect(404)
+        .then(({ body }) => {
+          const { msg } = body
+          expect(msg).toBe("No articles with that id")
+        })
+    })
+  })
+
+  describe("POST /api/articles/:article_id/comments", () => {
+    test("adds comment to specified article", () => {
+      return request(app)
+        .post("/api/articles/3/comments")
+        .send({
+          username: 'butter_bridge',
+          body: 'test-body'
+        })
+        .expect(201)
+        .then(({ body }) => {
+          const { comment } = body
+          expect(comment).toBe('test-body')
+        })
+    })
+    test("Responds with a 400 if the user doesn't exist", () => {
+      return request(app)
+        .post("/api/articles/3/comments")
+        .send({
+          username: 'fake-user',
+          body: 'test-body'
+        })
+        .expect(400)
+        .then(({ body }) => {
+          console.log(body)
+          const { msg } = body
+          expect(msg).toBe('Incorrect user')
+        })
+    })
+    test("Responds with a 404 if the article doesn't exist", () => {
+      return request(app)
+        .post("/api/articles/999/comments")
+        .send({
+          username: 'butter_bridge',
+          body: 'test-body'
+        })
+        .expect(404)
+        .then(({ body }) => {
+          const { msg } = body
+          expect(msg).toBe('No articles with that id')
+        })
+    })
+    test("returns 400 if article_id is not valid", () => {
+      return request(app)
+        .post("/api/articles/NotAnID/comments")
+        .send({
+          username: 'butter_bridge',
+          body: 'test-body'
+        })
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body
+          expect(msg).toBe('Invalid id')
+        })
+    })
+  })
+
+  describe("DELETE /api/comments/:comment_id", () => {
+    test("deletes given comment by comment_id", () => {
+      return request(app)
+        .delete("/api/comments/3")
+        .expect(204)
+    })
+    test("returns 404 if comment_id valid but doesn't exist", () => {
+      return request(app)
+        .delete("/api/comments/999")
+        .expect(404)
+        .then(({ body }) => {
+          const { msg } = body
+          expect(msg).toBe("No comment found")
+        })
+    })
+    test("returns 400 if comment_id not valid", () => {
+      return request(app)
+        .delete("/api/comments/notAnID")
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body
+          expect(msg).toBe("Invalid id")
+        })
+    })
+  })
+
+  describe("GET /api/users", () => {
+    test("Responds with all users", () => {
+      return request(app)
+        .get("/api/users")
+        .expect(200)
+        .then(({ body }) => {
+          const { users } = body
+          expect(users.length).toBe(4)
+          users.forEach((user) => {
+            expect(typeof user.username).toBe("string")
+            expect(typeof user.name).toBe("string"),
+              expect(typeof user.avatar_url).toBe("string")
+          })
+        })
+    })
+    test("Responds with 404 if no users found", () => {
+      return request(app)
+        .get("/api/notusers")
+        .expect(404)
+        .then(({ body }) => {
+          const { msg } = body
+          expect(msg).toBe("Page does not exist")
+        })
+    })
+  })
+
+  describe("General Errors", () => {
+    test("404: Responds with a 404 when presented a non-existant endpoint", () => {
+      return request(app)
+        .get('/api/nonexistant')
+        .expect(404)
+        .then(({ body }) => {
+          const { msg } = body
+          expect(msg).toBe("Page does not exist")
+        })
+    });
   });
-});
