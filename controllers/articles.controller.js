@@ -1,33 +1,49 @@
 const { modGetArticleByID, modGetArticles, modPatchArticles } = require("../models/articles.model")
 
-const conGetArticleByID = (request, response, next) => {
-    const {article_id} = request.params
+exports.conGetArticleByID = (request, response, next) => {
+    const { article_id } = request.params
     modGetArticleByID(article_id).then((article) => {
-        response.status(200).send({article: article})
+        if (article.length === 0) {
+            return Promise.reject({ status: 404, msg: "No articles with that id" })
+        } else {
+            response.status(200).send({ article: article })
+        }
     }).catch((err) => {
         next(err);
     })
 }
 
-const conGetArticles = (request, response, next) => {
+exports.conGetArticles = (request, response, next) => {
     modGetArticles().then((articles) => {
-        response.status(200).send({articles: articles})
-    }).catch((err) =>{
+        if (articles.length === 0) {
+            return Promise.reject({ status: 404, msg: "No articles found" })
+        } else {
+            response.status(200).send({ articles: articles })
+        }
+    }).catch((err) => {
         next(err);
     })
 }
 
-const conPatchArticles = (request, response, next) => {
+exports.conPatchArticles = (request, response, next) => {
     const { article_id } = request.params
     const { inc_votes } = request.body
+    if (typeof inc_votes === "number") {
         modPatchArticles(inc_votes, article_id).then((article) => {
-            const updatedArticle = article[0]
-            response.status(201).send({updatedArticle: updatedArticle})
+            if (article.length === 0) {
+                return Promise.reject({ status: 404, msg: "No articles with that id" });
+            } else {
+                const updatedArticle = article[0]
+                response.status(201).send({ updatedArticle: updatedArticle })
+            }
         })
-        .catch((err) =>{
-            next(err);
-        })
+            .catch((err) => {
+                next(err);
+            })
+    } else {
+        return Promise.reject({ status: 400, msg: "Votes provided not a number" })
+            .catch((err) => {
+                next(err);
+            })
+    }
 }
-
-
-module.exports = { conGetArticleByID, conGetArticles, conPatchArticles }
