@@ -74,7 +74,7 @@ return db.query(`CREATE TABLE comments (
   article_id SERIAL REFERENCES articles(article_id),
   body TEXT NOT NULL,
   votes INT DEFAULT 0,
-  author VARCHAR(40) REFERENCES users(username),
+  author VARCHAR(40) REFERENCES users(username) NOT NULL,
   created_at TIMESTAMP
   );`)
 }

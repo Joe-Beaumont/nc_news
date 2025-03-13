@@ -1,28 +1,26 @@
 const express = require("express")
-const { conGetAPI } = require("./controllers/api.controller")
-const { conGetTopics } = require("./controllers/topics.controller")
-const { conGetArticleByID, conGetArticles, conPatchArticles } = require('./controllers/articles.controller')
 const app = express();
 const { handle404, handlePostgresErrors, handleCustomErrors, handleServerErrors } = require("./controllers/error.controller");
-const { conPostComment, conGetComments, conDeleteComments } = require("./controllers/comments.controller");
+const { apiController, articleController, commentController, topicController } = require("./controllers/index")
+
 
 app.use(express.json());
 
-app.get("/api", conGetAPI);
+app.get("/api", apiController.conGetAPI);
 
-app.get("/api/topics", conGetTopics);
+app.get("/api/topics", topicController.conGetTopics);
 
-app.get("/api/articles/:article_id", conGetArticleByID);
+app.get("/api/articles", articleController.conGetArticles)
 
-app.get("/api/articles", conGetArticles)
+app.get("/api/articles/:article_id", articleController.conGetArticleByID);
 
-app.get("/api/articles/:article_id/comments", conGetComments)
+app.patch("/api/articles/:article_id", articleController.conPatchArticles)
 
-app.patch("/api/articles/:article_id", conPatchArticles)
+app.get("/api/articles/:article_id/comments", commentController.conGetComments)
 
-app.post("/api/articles/:article_id/comments", conPostComment)
+app.post("/api/articles/:article_id/comments", commentController.conPostComment)
 
-app.delete("/api/comments/:comment_id", conDeleteComments)
+app.delete("/api/comments/:comment_id", commentController.conDeleteComments)
 
 
 // Middleware

@@ -1,6 +1,6 @@
 const { modGetTopics } = require("../models/topics.model");
 
-const conGetTopics = (request, response) => {
+exports.conGetTopics = (request, response) => {
     modGetTopics().then((topics)=> {
         response.status(200).send({topics: topics})
     }).catch((err) => {
@@ -8,7 +8,3 @@ const conGetTopics = (request, response) => {
         next(err)
     })
 }
-
-
-
-module.exports = { conGetTopics }

@@ -165,7 +165,7 @@ describe("POST /api/articles/:article_id/comments", () => {
     return request(app)
       .post("/api/articles/3/comments")
       .send({
-        username: 'test-user',
+        username: 'butter_bridge',
         body: 'test-body'
       })
       .expect(201)
@@ -174,24 +174,38 @@ describe("POST /api/articles/:article_id/comments", () => {
         expect(comment).toBe('test-body')
       })
   })
-  // test("Responds with a 404 if the article doesn't exist", () =>{
-  //   return request(app)
-  //   .post("/api/articles/999/comments")
-  //   .send({
-  //     username: 'test-user',
-  //     body: 'test-body'
-  //   })
-  //   .expect(404)
-  //   .then(({ body }) => {
-  //     const { msg } = body
-  //     expect(msg).toBe('No article found')
-  //   })
-  // })
+  test("Responds with a 400 if the user doesn't exist", () => {
+    return request(app)
+      .post("/api/articles/3/comments")
+      .send({
+        username: 'fake-user',
+        body: 'test-body'
+      })
+      .expect(400)
+      .then(({ body }) => {
+        console.log(body)
+        const { msg } = body
+        expect(msg).toBe('Incorrect user')
+      })
+  })
+  test("Responds with a 404 if the article doesn't exist", () =>{
+    return request(app)
+    .post("/api/articles/999/comments")
+    .send({
+      username: 'butter_bridge',
+      body: 'test-body'
+    })
+    .expect(404)
+    .then(({ body }) => {
+      const { msg } = body
+      expect(msg).toBe('No articles with that id')
+    })
+  })
   test("returns 400 if article_id is not valid", () => {
     return request(app)
     .post("/api/articles/NotAnID/comments")
     .send({
-      username: 'test-user',
+      username: 'butter_bridge',
       body: 'test-body'
     })
     .expect(400)

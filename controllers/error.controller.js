@@ -22,7 +22,7 @@ function handleCustomErrors(err, req, res, next){
 
 function handleServerErrors(err, req, res, next){
     // console.log(err);
-    res.send({msg: "Internal server error"});
+    res.status(500).send({msg: "Internal server error"});
 };
 
 module.exports = { handle404, handlePostgresErrors, handleCustomErrors, handleServerErrors };

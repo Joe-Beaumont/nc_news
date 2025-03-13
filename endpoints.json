@@ -64,6 +64,28 @@
         "votes": 3,
         "comment_count": 6
     }
-  } 
+  },
 
+  "GET /api/articles/:article_id/comments" : {
+    "description": "serves all comments under the requested article",
+    "queries": ["author", "topic", "sort_by", "order"],
+    "exampleResponse": {
+      "comments":   [
+        {
+          "comment_id": 2,
+          "article_id": 3,
+          "body": "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.",
+          "votes": 14,
+          "author": "butter_bridge",
+          "created_at": "2020-10-16T05:03:00.000Z"
+        }
+      ]
+    }
+  },
+  
+  "DELETE /api/comments/:comment_id": {
+    "description": "Deletes comment of given id",
+    "queries": [],
+    "exampleResponse": 204
+  }
 }
