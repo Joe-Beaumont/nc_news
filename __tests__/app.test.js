@@ -242,6 +242,32 @@ describe("DELETE /api/comments/:comment_id", () => {
   })
 })
 
+describe("GET /api/users", () => {
+  test("Responds with all users", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        const { users } = body
+        expect(users.length).toBe(4)
+        users.forEach((user) => {
+          expect(typeof user.username).toBe("string")
+          expect(typeof user.name).toBe("string"),
+            expect(typeof user.avatar_url).toBe("string")
+        })
+      })
+  })
+  test("Responds with 404 if no users found", () => {
+    return request(app)
+      .get("/api/notusers")
+      .expect(404)
+      .then(({ body }) => {
+        const { msg } = body
+        expect(msg).toBe("Page does not exist")
+      })
+  })
+})
+
 describe("General Errors", () => {
   test("404: Responds with a 404 when presented a non-existant endpoint", () => {
     return request(app)
