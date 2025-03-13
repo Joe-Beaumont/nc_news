@@ -14,7 +14,9 @@ exports.conGetArticleByID = (request, response, next) => {
 }
 
 exports.conGetArticles = (request, response, next) => {
-    modGetArticles().then((articles) => {
+    const sort_by = (Object.keys(request.query))[0]
+    const order = request.query[sort_by]
+    modGetArticles(sort_by, order).then((articles) => {
         if (articles.length === 0) {
             return Promise.reject({ status: 404, msg: "No articles found" })
         } else {
