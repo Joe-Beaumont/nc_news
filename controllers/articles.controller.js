@@ -14,17 +14,20 @@ exports.conGetArticleByID = (request, response, next) => {
 }
 
 exports.conGetArticles = (request, response, next) => {
-    const sort_by = (Object.keys(request.query))[0]
-    const order = request.query[sort_by]
-    modGetArticles(sort_by, order).then((articles) => {
-        if (articles.length === 0) {
-            return Promise.reject({ status: 404, msg: "No articles found" })
-        } else {
-            response.status(200).send({ articles: articles })
-        }
-    }).catch((err) => {
-        next(err);
-    })
+    const query1 = (Object.keys(request.query))[0]
+    const query2 = request.query[query1]
+    // Need to check sort by and order are valid
+    // Need to differentiate between filter and sort
+    modGetArticles(query1, query2)
+        .then((articles) => {
+            if (articles.length === 0) {
+                return Promise.reject({ status: 404, msg: "No articles found" })
+            } else {
+                response.status(200).send({ articles: articles })
+            }
+        }).catch((err) => {
+            next(err);
+        })
 }
 
 exports.conPatchArticles = (request, response, next) => {
