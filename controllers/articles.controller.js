@@ -14,17 +14,25 @@ exports.conGetArticleByID = (request, response, next) => {
 }
 
 exports.conGetArticles = (request, response, next) => {
-    const sort_by = (Object.keys(request.query))[0]
-    const order = request.query[sort_by]
-    modGetArticles(sort_by, order).then((articles) => {
-        if (articles.length === 0) {
-            return Promise.reject({ status: 404, msg: "No articles found" })
-        } else {
-            response.status(200).send({ articles: articles })
-        }
-    }).catch((err) => {
-        next(err);
-    })
+    // const query1 = (Object.keys(request.query))[0]
+    // const query2 = request.query[query1]
+
+    const { filter } = request.query
+    const { by } = request.query
+    const { sort_by } = request.query
+    const { order } = request.query
+
+    modGetArticles(filter, by, sort_by, order)
+        .then((articles) => {
+            if (articles.length === 0) {
+                return Promise.reject({ status: 404, msg: "No articles found" })
+            } else {
+                response.status(200).send({ articles: articles })
+            }
+        }).catch((err) => {
+            next(err);
+        })
+
 }
 
 exports.conPatchArticles = (request, response, next) => {
