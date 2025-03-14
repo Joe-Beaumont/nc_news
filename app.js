@@ -2,7 +2,11 @@ const express = require("express")
 const app = express();
 const { handle404, handlePostgresErrors, handleCustomErrors, handleServerErrors } = require("./controllers/error.controller");
 const { apiController, articleController, commentController, topicController, userController } = require("./controllers/index")
+//routers
 
+// const apiRouter = require("./routers/api.router")
+
+// // app.use("/api", apiRouter)
 
 app.use(express.json());
 
