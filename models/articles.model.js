@@ -9,43 +9,66 @@ exports.modGetArticleByID = (article_id) => {
         })
 }
 
-exports.modGetArticles = (query1 = "created_at", query2 = "desc") => {
+exports.modGetArticles = (filter, by, sort_by, order) => {
 
-    const allowedInputs = ["article_id", "title", "topic", "author", "body", "created_at", "votes", "article_img_url"]
-    if (!allowedInputs.includes(query1)) {
+    if (sort_by === undefined) {
+        sort_by = 'created_at'
+        order = 'desc'
+    }
+
+    const allowedSort = ["article_id", "title", "topic", "author", "body", "created_at", "votes", "article_img_url"]
+    if (!allowedSort.includes(sort_by)) {
         return Promise.reject({ status: 400, msg: "Invalid query" })
     }
-    if (query2 === "desc" || query2 ===  "asc" || query2 ===  "ASC" || query2 ===  "DESC") {
-        const sortArticles = format(
-            `SELECT a.article_id, a.title, a.topic,
-                    a.author, a.created_at, a.votes, a.article_img_url, 
-                    CAST(COUNT(c.article_id) AS INT) AS comment_count 
-                    FROM articles a LEFT JOIN comments 
-                    c ON a.article_id = c.article_id 
-                    GROUP BY a.article_id 
-                    ORDER BY %I %s`, query1, query2
-        )
-        return db
-            .query(sortArticles)
-            .then(({ rows }) => {
-                return rows
-            })
-    } else {
-    const filterBy = format(`SELECT a.article_id, a.title, a.topic,
-                    a.author, a.created_at, a.votes, a.article_img_url, 
-                    CAST(COUNT(c.article_id) AS INT) AS comment_count
-                    FROM articles a LEFT JOIN comments 
-                    c ON a.article_id = c.article_id 
-                    WHERE %I = %L 
-                    GROUP BY a.article_id 
-                    ORDER BY a.created_at desc`, query1, query2)
-    return db
-        .query(filterBy)
-        .then(({ rows }) => {
-            return rows
-        })
+    
+ if(filter !== undefined) {
+    const allowedFilter = ["article_id", "title", "topic", "author", "body", "created_at", "votes", "article_img_url"]
+    if (!allowedFilter.includes(filter)) {
+        return Promise.reject({ status: 400, msg: "Invalid query" })
     }
 }
+
+    const allowedDirections = ["asc", "ASC", "desc", "DESC"]
+    if (!allowedDirections.includes(order)) {
+        return Promise.reject({ status: 400, msg: "Invalid query" })
+    }
+
+    let queryStr = `SELECT a.article_id, a.title, a.topic,
+    a.author, a.created_at, a.votes, a.article_img_url, 
+    CAST(COUNT(c.article_id) AS INT) AS comment_count
+    FROM articles a LEFT JOIN comments 
+    c ON a.article_id = c.article_id`
+
+    const queryValues = []
+
+    console.log(filter, by, sort_by, order)
+
+    if (filter && by) {
+        queryValues.push(filter)
+        queryValues.push(by)
+        by = `'${by}'`
+        queryStr += ` WHERE a.${filter} = ${by}`
+    }
+    if (queryValues.length === 2) {
+        queryValues.push(sort_by)
+        queryValues.push(order)
+        queryStr += ` GROUP BY a.article_id ORDER BY a.${sort_by} ${order};`
+    } else {
+        queryValues.push(sort_by)
+        queryValues.push(order)
+        queryStr += ` GROUP BY a.article_id ORDER BY a.${sort_by} ${order};`
+    }
+
+    console.log(queryStr)
+    return db
+        .query(queryStr)
+        .then(({ rows }) => {
+            console.log(rows)
+            return rows;
+        })
+}
+
+
 
 exports.modPatchArticles = (votes, article_id) => {
     return db

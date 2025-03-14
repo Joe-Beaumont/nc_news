@@ -65,7 +65,7 @@ describe("GET /api/articles/:article_id", () => {
   })
 });
 
-describe("GET /api/articles", () => {
+describe.only("GET /api/articles", () => {
   test("responds with all articles sorted by created_at in descending order as default", () => {
     return request(app)
       .get("/api/articles")
@@ -88,7 +88,7 @@ describe("GET /api/articles", () => {
   })
   test("Responds with all articles, sorted by given column name and in asc or desc as requested", () => {
     return request(app)
-      .get("/api/articles?votes=ASC")
+      .get("/api/articles?sort_by=votes&order=asc")
       .expect(200)
       .then(({ body }) => {
         const { articles } = body
@@ -106,9 +106,18 @@ describe("GET /api/articles", () => {
         })
       })
   })
-  test("Responds 400 if sorted_by or order are invalid", () => {
+  test("Responds 400 if sorted_by is invalid", () => {
     return request(app)
-      .get("/api/articles?notaquery_BSC")
+      .get("/api/articles?sort_by=notAColumn&order=asc")
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body
+        expect(msg).toBe("Invalid query")
+      })
+  })
+  test("Responds 400 if order is invalid", () => {
+    return request(app)
+      .get("/api/articles?sort_by=votes&order=notADirection")
       .expect(400)
       .then(({ body }) => {
         const { msg } = body
@@ -117,7 +126,7 @@ describe("GET /api/articles", () => {
   })
   test("responds with article filtered by specified topic", () => {
     return request(app)
-      .get("/api/articles?topic=cats")
+      .get("/api/articles?filter=topic&by=cats")
       .expect(200)
       .then(({ body }) => {
         const { articles } = body
@@ -133,6 +142,24 @@ describe("GET /api/articles", () => {
           expect(typeof article.article_img_url).toEqual("string");
           expect(typeof article.comment_count).toEqual("number")
         })
+      })
+  })
+  test("Responds 400 if filter is invalid", () => {
+    return request(app)
+      .get("/api/articles?filter=notacolumn&by=cats")
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body
+        expect(msg).toBe("Invalid query")
+      })
+  })
+  test("Responds 404 if topic is invalid", () => {
+    return request(app)
+      .get("/api/articles?filter=topic&by=notATopic")
+      .expect(404)
+      .then(({ body }) => {
+        const { msg } = body
+        expect(msg).toBe("No articles found")
       })
   })
 })
@@ -233,7 +260,6 @@ describe("POST /api/articles/:article_id/comments", () => {
       })
       .expect(400)
       .then(({ body }) => {
-        console.log(body)
         const { msg } = body
         expect(msg).toBe('Incorrect user')
       })

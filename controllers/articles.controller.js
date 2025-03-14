@@ -14,11 +14,15 @@ exports.conGetArticleByID = (request, response, next) => {
 }
 
 exports.conGetArticles = (request, response, next) => {
-    const query1 = (Object.keys(request.query))[0]
-    const query2 = request.query[query1]
-    // Need to check sort by and order are valid
-    // Need to differentiate between filter and sort
-    modGetArticles(query1, query2)
+    // const query1 = (Object.keys(request.query))[0]
+    // const query2 = request.query[query1]
+
+    const { filter } = request.query
+    const { by } = request.query
+    const { sort_by } = request.query
+    const { order } = request.query
+
+    modGetArticles(filter, by, sort_by, order)
         .then((articles) => {
             if (articles.length === 0) {
                 return Promise.reject({ status: 404, msg: "No articles found" })
@@ -28,6 +32,7 @@ exports.conGetArticles = (request, response, next) => {
         }).catch((err) => {
             next(err);
         })
+
 }
 
 exports.conPatchArticles = (request, response, next) => {
