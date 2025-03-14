@@ -3,7 +3,11 @@ const format = require("pg-format");
 
 exports.modGetArticleByID = (article_id) => {
     return db
-        .query(`SELECT * FROM articles WHERE article_id = $1`, [article_id])
+        .query(`SELECT a.article_id, a.title, a.topic,
+    a.author, a.body, a.created_at, a.votes, a.article_img_url, 
+    CAST(COUNT(c.article_id) AS INT) AS comment_count
+    FROM articles a LEFT JOIN comments 
+    c ON a.article_id = c.article_id WHERE a.article_id = $1 GROUP BY a.article_id `, [article_id])
         .then(({ rows }) => {
             return rows;
         })
@@ -41,8 +45,6 @@ exports.modGetArticles = (filter, by, sort_by, order) => {
 
     const queryValues = []
 
-    console.log(filter, by, sort_by, order)
-
     if (filter && by) {
         queryValues.push(filter)
         queryValues.push(by)
@@ -59,11 +61,9 @@ exports.modGetArticles = (filter, by, sort_by, order) => {
         queryStr += ` GROUP BY a.article_id ORDER BY a.${sort_by} ${order};`
     }
 
-    console.log(queryStr)
     return db
         .query(queryStr)
         .then(({ rows }) => {
-            console.log(rows)
             return rows;
         })
 }

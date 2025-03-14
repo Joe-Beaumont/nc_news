@@ -63,9 +63,18 @@ describe("GET /api/articles/:article_id", () => {
         expect(msg).toEqual("No articles with that id")
       })
   })
+  test("200: Article contains comment count", () => {
+    return request(app)
+      .get('/api/articles/3')
+      .expect(200)
+      .then(({ body }) => {
+        const { article } = body;
+        expect(article[0].comment_count).toEqual(2);
+      })
+  })
 });
 
-describe.only("GET /api/articles", () => {
+describe("GET /api/articles", () => {
   test("responds with all articles sorted by created_at in descending order as default", () => {
     return request(app)
       .get("/api/articles")
