@@ -2,31 +2,33 @@ const express = require("express")
 const app = express();
 const { handle404, handlePostgresErrors, handleCustomErrors, handleServerErrors } = require("./controllers/error.controller");
 const { apiController, articleController, commentController, topicController, userController } = require("./controllers/index")
-//routers
 
-// const apiRouter = require("./routers/api.router")
-
-// // app.use("/api", apiRouter)
 
 app.use(express.json());
 
-app.get("/api", apiController.conGetAPI);
+//routers
 
-app.get("/api/topics", topicController.conGetTopics);
+const apiRouter = require("./routers/api.router")
+app.use("/api", apiRouter)
 
-app.get("/api/articles", articleController.conGetArticles)
 
-app.get("/api/articles/:article_id", articleController.conGetArticleByID);
+// app.get("/api", apiController.conGetAPI);
 
-app.patch("/api/articles/:article_id", articleController.conPatchArticles)
+// app.get("/api/topics", topicController.conGetTopics);
 
-app.get("/api/articles/:article_id/comments", commentController.conGetComments)
+// app.get("/api/articles", articleController.conGetArticles)
 
-app.post("/api/articles/:article_id/comments", commentController.conPostComment)
+// app.get("/api/articles/:article_id", articleController.conGetArticleByID);
 
-app.delete("/api/comments/:comment_id", commentController.conDeleteComments)
+// app.patch("/api/articles/:article_id", articleController.conPatchArticles)
 
-app.get("/api/users", userController.conGetUsers)
+// app.get("/api/articles/:article_id/comments", commentController.conGetComments)
+
+// app.post("/api/articles/:article_id/comments", commentController.conPostComment)
+
+// app.delete("/api/comments/:comment_id", commentController.conDeleteComments)
+
+// app.get("/api/users", userController.conGetUsers)
 
 
 // Middleware
