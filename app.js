@@ -2,8 +2,9 @@ const express = require("express")
 const app = express();
 const { handle404, handlePostgresErrors, handleCustomErrors, handleServerErrors } = require("./controllers/error.controller");
 const { apiController, articleController, commentController, topicController, userController } = require("./controllers/index")
+const cors = require("cors");
 
-
+app.use(cors());
 app.use(express.json());
 
 //routers
