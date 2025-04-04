@@ -13,15 +13,15 @@ exports.modGetArticleByID = (article_id) => {
         })
 }
 
-exports.modGetArticles = (filter, by, sort_by, order) => {
+exports.modGetArticles = (filter, by, sort, order) => {
 
-    if (sort_by === undefined) {
-        sort_by = 'created_at'
+    if (sort === undefined) {
+        sort = 'created_at'
         order = 'desc'
     }
 
     const allowedSort = ["article_id", "title", "topic", "author", "body", "created_at", "votes", "article_img_url"]
-    if (!allowedSort.includes(sort_by)) {
+    if (!allowedSort.includes(sort)) {
         return Promise.reject({ status: 400, msg: "Invalid query" })
     }
     
@@ -52,13 +52,13 @@ exports.modGetArticles = (filter, by, sort_by, order) => {
         queryStr += ` WHERE a.${filter} = ${by}`
     }
     if (queryValues.length === 2) {
-        queryValues.push(sort_by)
+        queryValues.push(sort)
         queryValues.push(order)
-        queryStr += ` GROUP BY a.article_id ORDER BY a.${sort_by} ${order};`
+        queryStr += ` GROUP BY a.article_id ORDER BY a.${sort} ${order};`
     } else {
-        queryValues.push(sort_by)
+        queryValues.push(sort)
         queryValues.push(order)
-        queryStr += ` GROUP BY a.article_id ORDER BY a.${sort_by} ${order};`
+        queryStr += ` GROUP BY a.article_id ORDER BY a.${sort} ${order};`
     }
 
     return db
