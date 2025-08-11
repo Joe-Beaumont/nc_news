@@ -387,3 +387,39 @@ describe("PATCH /api/comments/:comment_id", () => {
       })
   });
 });
+
+describe("GET /api/comments/:comment_id", () => {
+  test("Responds with the given comment", () => {
+    return request(app)
+      .get("/api/comments/5")
+      .expect(200)
+      .then(({ body }) => {
+        const { comment } = body
+          expect(comment.comment_id).toBe(5)
+          expect(typeof comment.body).toBe("string"),
+            expect(typeof comment.votes).toBe("number"),
+            expect(typeof comment.author).toBe("string"),
+            expect(typeof comment.created_at).toBe("string")
+      })
+  })
+      
+      test("Responds with a 404 if the comment doesn't exist", () => {
+        return request(app)
+        .get("/api/comments/999")
+        .expect(404)
+        .then(({ body }) => {
+          const { msg } = body
+          expect(msg).toBe("No comments found")
+        })
+      })
+      test("returns 400 if comment_id is not valid", () => {
+        return request(app)
+        .get("/api/comments/notAnID/")
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body
+          expect(msg).toBe("Invalid id")
+        })
+      })
+})
+      

@@ -2,10 +2,19 @@ const { use } = require("../app");
 const db = require("../db/connection")
 const format = require("pg-format");
 
-exports.modGetComments = (article_id) => {
+exports.modGetCommentsbyArticle = (article_id) => {
     return db
         .query(`SELECT * FROM comments c WHERE c.article_id = $1 ORDER BY c.created_at ASC`, [article_id])
         .then(({ rows }) => {
+            return rows;
+        })
+}
+
+exports.modGetComments = (comment_id) => {
+    return db
+        .query(`SELECT * FROM comments c WHERE c.comment_id = $1`, [comment_id])
+        .then(({ rows }) => {
+            // console.log(rows, "<< model")
             return rows;
         })
 }
