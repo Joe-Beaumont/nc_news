@@ -39,8 +39,6 @@ exports.modPostComment = (article_id, body, username) => {
         })
 }
 
-
-
 exports.modDeleteComments = (comment_id) => {
     return db.query(`SELECT * FROM comments c WHERE c.comment_id = $1`, [comment_id])
         .then(({ rows }) => {
@@ -52,5 +50,14 @@ exports.modDeleteComments = (comment_id) => {
                         return rows;
                     })
             }
+        })
+}
+
+
+exports.modPatchComments = (votes, comment_id) => {
+    return db
+        .query(`UPDATE comments c SET votes = votes + $1 WHERE c.comment_id = $2 RETURNING *`, [votes, comment_id])
+        .then(({ rows }) => {
+            return rows;
         })
 }

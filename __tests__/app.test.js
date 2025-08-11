@@ -7,6 +7,8 @@ const app = require("../app");
 require("jest-sorted")
 
 
+console.log(db)
+
 beforeAll(() => seed(data));
 afterAll(() => db.end());
 
@@ -97,7 +99,7 @@ describe("GET /api/articles", () => {
   })
   test("Responds with all articles, sorted by given column name and in asc or desc as requested", () => {
     return request(app)
-      .get("/api/articles?sort_by=votes&order=asc")
+      .get("/api/articles?sort=votes&order=asc")
       .expect(200)
       .then(({ body }) => {
         const { articles } = body
@@ -117,7 +119,7 @@ describe("GET /api/articles", () => {
   })
   test("Responds 400 if sorted_by is invalid", () => {
     return request(app)
-      .get("/api/articles?sort_by=notAColumn&order=asc")
+      .get("/api/articles?sort=notAColumn&order=asc")
       .expect(400)
       .then(({ body }) => {
         const { msg } = body
@@ -126,7 +128,7 @@ describe("GET /api/articles", () => {
   })
   test("Responds 400 if order is invalid", () => {
     return request(app)
-      .get("/api/articles?sort_by=votes&order=notADirection")
+      .get("/api/articles?sort=votes&order=notADirection")
       .expect(400)
       .then(({ body }) => {
         const { msg } = body

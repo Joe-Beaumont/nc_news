@@ -20,13 +20,13 @@ exports.modGetArticles = (filter, by, sort, order) => {
         order = 'desc'
     }
 
-    const allowedSort = ["article_id", "title", "topic", "author", "body", "created_at", "votes", "article_img_url"]
+    const allowedSort = ["article_id", "created_at", "votes"]
     if (!allowedSort.includes(sort)) {
         return Promise.reject({ status: 400, msg: "Invalid query" })
     }
     
  if(filter !== undefined) {
-    const allowedFilter = ["article_id", "title", "topic", "author", "body", "created_at", "votes", "article_img_url"]
+    const allowedFilter = ["article_id", "title", "topic", "author"]
     if (!allowedFilter.includes(filter)) {
         return Promise.reject({ status: 400, msg: "Invalid query" })
     }

@@ -11,6 +11,7 @@ commentsRouter
 .route("/:article_id/comments")
 .get(commentController.conGetComments)
 .post(commentController.conPostComment)
+.patch(commentController.conPatchComments)
 
 
 module.exports = commentsRouter;
