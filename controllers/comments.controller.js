@@ -1,4 +1,4 @@
-const { modPostComment, modGetComments, modDeleteComments, modPatchComments } = require("../models/comments.model")
+const { modPostComment, modGetCommentsbyArticle, modDeleteComments, modPatchComments, modGetComments } = require("../models/comments.model")
 const { modGetArticleByID } = require("../models/articles.model")
 
 exports.conPostComment = (request, response, next) => {
@@ -28,11 +28,11 @@ exports.conPostComment = (request, response, next) => {
     }
 }
 
-exports.conGetComments = (request, response, next) => {
+exports.conGetCommentsbyArticle = (request, response, next) => {
     const { article_id } = request.params
     const regex = /\d/g
     if (regex.test(article_id)) {
-        modGetComments(article_id)
+        modGetCommentsbyArticle(article_id)
             .then((comments) => {
                 if (comments.length === 0) {
                     return Promise.reject({ status: 404, msg: "No comments found" })
@@ -50,6 +50,27 @@ exports.conGetComments = (request, response, next) => {
     }
 }
 
+exports.conGetComments = (request, response, next) => {
+    const { comment_id } = request.params
+    const regex = /\d/g
+    if (regex.test(comment_id)) {
+        modGetComments(comment_id)
+            .then((comment) => {
+                if (comment.length === 0) {
+                    return Promise.reject({ status: 404, msg: "No comments found" })
+                } else {
+                    response.status(200).send({ comment: comment[0] })
+                }
+            }).catch((err) => {
+                next(err)
+            })
+    } else {
+        return Promise.reject({ status: 400, msg: "Invalid id" })
+            .catch((err) => {
+                next(err)
+            })
+    }
+}
 exports.conDeleteComments = (request, response, next) => {
     const { comment_id } = request.params
     const regex = /\d/g
