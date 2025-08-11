@@ -1,4 +1,4 @@
-const { modPostComment, modGetComments, modDeleteComments } = require("../models/comments.model")
+const { modPostComment, modGetComments, modDeleteComments, modPatchComments } = require("../models/comments.model")
 const { modGetArticleByID } = require("../models/articles.model")
 
 exports.conPostComment = (request, response, next) => {

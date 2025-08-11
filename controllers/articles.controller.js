@@ -16,7 +16,6 @@ exports.conGetArticleByID = (request, response, next) => {
 exports.conGetArticles = (request, response, next) => {
     // const query1 = (Object.keys(request.query))[0]
     // const query2 = request.query[query1]
-    console.log(request.query)
 
     const { filter } = request.query
     const { by } = request.query
