@@ -6,7 +6,6 @@ const seed = require("../db/seeds/seed");
 const app = require("../app");
 require("jest-sorted")
 
-
 beforeAll(() => seed(data));
 afterAll(() => db.end());
 
@@ -97,7 +96,7 @@ describe("GET /api/articles", () => {
   })
   test("Responds with all articles, sorted by given column name and in asc or desc as requested", () => {
     return request(app)
-      .get("/api/articles?sort_by=votes&order=asc")
+      .get("/api/articles?sort=votes&order=asc")
       .expect(200)
       .then(({ body }) => {
         const { articles } = body
@@ -117,7 +116,7 @@ describe("GET /api/articles", () => {
   })
   test("Responds 400 if sorted_by is invalid", () => {
     return request(app)
-      .get("/api/articles?sort_by=notAColumn&order=asc")
+      .get("/api/articles?sort=notAColumn&order=asc")
       .expect(400)
       .then(({ body }) => {
         const { msg } = body
@@ -126,7 +125,7 @@ describe("GET /api/articles", () => {
   })
   test("Responds 400 if order is invalid", () => {
     return request(app)
-      .get("/api/articles?sort_by=votes&order=notADirection")
+      .get("/api/articles?sort=votes&order=notADirection")
       .expect(400)
       .then(({ body }) => {
         const { msg } = body
@@ -344,8 +343,6 @@ describe("GET /api/users", () => {
   })
 })
 
-
-
 describe("General Errors", () => {
   test("404: Responds with a 404 when presented a non-existant endpoint", () => {
     return request(app)
@@ -354,6 +351,39 @@ describe("General Errors", () => {
       .then(({ body }) => {
         const { msg } = body
         expect(msg).toBe("Page does not exist")
+      })
+  });
+});
+
+describe("PATCH /api/comments/:comment_id", () => {
+  test("Updates votes on comment by amount provided in object", () => {
+    return request(app)
+      .patch("/api/comments/5")
+      .send({ inc_votes: 3 })
+      .expect(201)
+      .then(({ body }) => {
+        const { votes } = body.updatedComment
+        expect(votes).toBe(3)
+      })
+    })
+    test("responds with 400 if votes is not a number", () => {
+      return request(app)
+      .patch("/api/comments/5")
+      .send({ inc_votes: "3" })
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body
+        expect(msg).toEqual("Votes provided not a number")
+      })
+  })
+  test("responds with 404 if id provided is valid but doesn't exist", () => {
+    return request(app)
+      .patch("/api/comments/999")
+      .send({ inc_votes: 3 })
+      .expect(404)
+      .then(({ body }) => {
+        const { msg } = body
+        expect(msg).toBe("No comments with that id")
       })
   });
 });

@@ -1,4 +1,4 @@
-const { modPostComment, modGetComments, modDeleteComments } = require("../models/comments.model")
+const { modPostComment, modGetComments, modDeleteComments, modPatchComments } = require("../models/comments.model")
 const { modGetArticleByID } = require("../models/articles.model")
 
 exports.conPostComment = (request, response, next) => {
@@ -68,4 +68,27 @@ exports.conDeleteComments = (request, response, next) => {
             })
     }
 
+}
+
+exports.conPatchComments = (request, response, next) => {
+    const { comment_id } = request.params
+    const { inc_votes } = request.body
+    if (typeof inc_votes === "number") {
+        modPatchComments(inc_votes, comment_id).then((comment) => {
+            if (comment.length === 0) {
+                return Promise.reject({ status: 404, msg: "No comments with that id" });
+            } else {
+                const updatedComment = comment[0]
+                response.status(201).send({ updatedComment: updatedComment })
+            }
+        })
+            .catch((err) => {
+                next(err);
+            })
+    } else {
+        return Promise.reject({ status: 400, msg: "Votes provided not a number" })
+            .catch((err) => {
+                next(err);
+            })
+    }
 }
