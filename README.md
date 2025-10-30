@@ -16,7 +16,7 @@ In the northcoders-news-BE directory, create two .env files:
 In each of these files write the following statements respectively:
 PGDATABASE=nc_news
 
-DATABASE_URL=postgresql://postgres.gckjkmpfwakgqrmoyhvz:SwAgAxe1993S@aws-0-eu-west-2.pooler.supabase.com:6543/postgres
+DATABASE_URL=postgresql://postgres.gckjkmpfwakgqrmoyhvz:<YourPasswordHere>@aws-0-eu-west-2.pooler.supabase.com:6543/postgres
 PGDATABASE=nc_news
 
 Seed Database:
